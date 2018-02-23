@@ -85,12 +85,16 @@ function initPopulate(sh){
         var shop = shops.next();
         var divSct1 = document.getElementById("sct1");
         var cat = document.getElementById("listCategories");
+        var ul = document.getElementById("navShop");
         
         document.getElementById("catMenu").style.visibility = "hidden";
         
+        removeChildsElement(ul);
+        shopsMenusPopulate(sh);
+        
         removeChildsElement(divSct1);
         menuForms();
-
+        
         while (!shop.done){
             var divCol = document.createElement("div");
             divCol.setAttribute("class", "col-sm-4 col-lg-4 col-md-4");
@@ -143,6 +147,8 @@ function shopsMenusPopulate (erp){
     var ul = document.getElementById("navShop");   
     var shops = erp.shops;
     var shop = shops.next();
+    
+    removeChildsElement(ul);
     
     ini[0].addEventListener("click", initPopulate(erp));
     
@@ -216,61 +222,51 @@ function menuCategoryShopPopulate(shop, erp){
 }
 
 function menuForms(){
+    
+    function liForm(name, func){
+        var a = document.createElement("a");
+        a.setAttribute("href", "#");
+        a.setAttribute("class", "list-group-item");
+        a.appendChild(document.createTextNode(name));
+        a.addEventListener("click", func());
+        cat.appendChild(a);
+    }
+    
     var cat = document.getElementById("listCategories");
     
     removeChildsElement(cat);
     
     var p = document.createElement("p");
     p.setAttribute("class", "h3");
-    p.appendChild(document.createTextNode("Categorias"));
+    
+    p.appendChild(document.createTextNode("Autenticación"));
     cat.appendChild(p);
     
-    var a = document.createElement("a");
-    a.setAttribute("href", "#");
-    a.setAttribute("class", "list-group-item");
-    a.appendChild(document.createTextNode("Añadir categoria"));
-    a.addEventListener("click", addCategoryForm());
-    cat.appendChild(a);
+    liForm("Iniciar Sesión", sesionForm);
     
-    a = document.createElement("a");
-    a.setAttribute("href", "#");
-    a.setAttribute("class", "list-group-item");
-    a.appendChild(document.createTextNode("Modificar categoria"));
-    a.addEventListener("click", updCategoryForm());
-    cat.appendChild(a);
+    p = document.createElement("p");
+    p.setAttribute("class", "h3"); p.appendChild(document.createTextNode("Categorias"));
+    cat.appendChild(p);
     
-    a = document.createElement("a");
-    a.setAttribute("href", "#");
-    a.setAttribute("class", "list-group-item");
-    a.appendChild(document.createTextNode("Eliminar categoria"));
-    a.addEventListener("click", delCategoryForm());
-    cat.appendChild(a);
+    liForm("Añadir categoria", addCategoryForm);
+    liForm("Modificar categoria", updCategoryForm);
+    liForm("Eliminar categoria", delCategoryForm);
     
     p = document.createElement("p");
     p.setAttribute("class", "h3");
     p.appendChild(document.createTextNode("Tiendas"));
     cat.appendChild(p);
     
-    a = document.createElement("a");
-    a.setAttribute("href", "#");
-    a.setAttribute("class", "list-group-item");
-    a.appendChild(document.createTextNode("Añadir tienda"));
-    a.addEventListener("click", addShopForm());
-    cat.appendChild(a);
+    liForm("Añadir tienda", addShopForm);
+    liForm("Modificar tienda", updShopForm);
+    liForm("Eliminar tienda", delShopForm);
     
-    a = document.createElement("a");
-    a.setAttribute("href", "#");
-    a.setAttribute("class", "list-group-item");
-    a.appendChild(document.createTextNode("Actualizar tienda"));
-    a.addEventListener("click", updShopForm());
-    cat.appendChild(a);
-    
-    a = document.createElement("a");
-    a.setAttribute("href", "#");
-    a.setAttribute("class", "list-group-item");
-    a.appendChild(document.createTextNode("Eliminar tienda"));
-    a.addEventListener("click", delShopForm());
-    cat.appendChild(a);
+    p = document.createElement("p");
+    p.setAttribute("class", "h3");
+    p.appendChild(document.createTextNode("Productos"));
+    cat.appendChild(p);
+    liForm("Añadir producto", addProForm);
+    liForm("Eliminar producto", delProForm);
 }
 
 function productCategory(product){
@@ -360,7 +356,7 @@ function productShopPopulate(element, product){
         divCap.appendChild(a);
 
         p = document.createElement("p");
-        p.appendChild(document.createTextNode("Stock: "+product.product.stock));
+        p.appendChild(document.createTextNode("Stock: "+product.stock));
         divCap.appendChild(p);
 
         divThumb.appendChild(divCap);
@@ -420,7 +416,7 @@ function openWindows(product){
         divCap.appendChild(p);
 
         p = listWindows[long].document.createElement("p");
-        p.appendChild(document.createTextNode("Stock General: "+productShop.stock));
+        p.appendChild(document.createTextNode("Stock General: "+productShop.stockGen));
         divCap.appendChild(p);
         
         divThumb.appendChild(divCap);

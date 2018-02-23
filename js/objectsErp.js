@@ -53,12 +53,12 @@ function Product(serialNumberValue, nameValue, priceValue){
             throw new InvalidAccessConstructorException();
 
         if (serialNumberValue === undefined || serialNumberValue === '') throw new EmptyValueException("serialNumber");
-        if (typeof serialNumberValue !== 'number') throw new InvalidValueException("pages",serialNumberValue); 
+        if (typeof serialNumberValue !== 'number') throw new InvalidValueException("serialNumber",serialNumberValue); 
 
         if (nameValue === undefined || nameValue === '') throw new EmptyValueException("name");	
 
         if (priceValue === undefined || priceValue === '') throw new EmptyValueException("price");
-        if (typeof priceValue !== 'number') throw new InvalidValueException("pages",priceValue);
+        if (typeof priceValue !== 'number') throw new InvalidValueException("price",priceValue);
     
         nameValue = nameValue.trim();
 
@@ -68,6 +68,7 @@ function Product(serialNumberValue, nameValue, priceValue){
         var price = priceValue;
         var tax = null;
         var images = [];
+        var stockGen = 0;
 
         Object.defineProperty(this, 'serialNumber', {
             get:function(){
@@ -125,6 +126,16 @@ function Product(serialNumberValue, nameValue, priceValue){
             get:function(){
                 return images;
             },		
+        });
+    
+        Object.defineProperty(this, 'stockGen', {
+            get:function(){
+                return stockGen;
+            },
+            set:function(value){
+                if (value === undefined || value === '') throw new EmptyValueException("stockGen");	
+                stockGen = value;
+            }		
         });
 
 }

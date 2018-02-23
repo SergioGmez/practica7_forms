@@ -119,6 +119,12 @@ function StoreHouse(){
 				name = value;
 			}		
 		});
+    
+    Object.defineProperty(this, 'products', {
+			get:function(){
+				return products;
+			},	
+		});
 	
     //Definición del metodo 'get' del atributo categories. Devuelve iterador.
     Object.defineProperty(this, 'categories', {
@@ -202,6 +208,11 @@ function StoreHouse(){
     //Categoría por defecto.
 	var defaultCategory = new Category ("Anonymous");
 	this.addCategory(defaultCategory);
+     Object.defineProperty(this, 'defaultCategory', {
+			get:function(){
+				return defaultCategory;
+			}	
+	 });
     
     //Metodo que permite añadir un producto con una categoria. Devuelve el numero de productos de dicha categoria.
     this.addProduct = function(product, category){
@@ -214,7 +225,6 @@ function StoreHouse(){
 		if (!(category instanceof Category)) { 
 			throw new CategoryStoreHouseException();
 		}		
-
 
 		var productPosition = getProductIndex(product);
         if (productPosition === -1){
@@ -230,7 +240,7 @@ function StoreHouse(){
         
 		if (productCategoryPos === -1){
 			categories[categoryPosition].products.push(product);
-            shops[0].products.push(product);
+            this.addProductInShop(product, shops[0], 0)
 		}else{
             throw new ProductExistsException(product);
 		}	
@@ -245,29 +255,33 @@ function StoreHouse(){
         
         var productPosition = getProductIndex(product);
 
-		var i = categories.length - 1, categoryPosition = -1;
-		while (i >= 0 && categoryPosition === -1){					
-			categoryPosition = getCategoryProducts(product, categories[i].products); 
-			i--;
-		}
-        
-        var y = shops.length - 1, shopPosition = -1;
-		while (y >= 0 && shopPosition === -1){					
-			shopPosition = getShopProducts(product, shops[y].products); 
-			y--;
-		}
+        if (productPosition !== -1){
+            
+            var index;
+            var categories = sh.categories;
+            var category = categories.next();
 
-		if (productPosition !== -1){
+            while (category.done !== true){
+                index = getCategoryProducts(product, category.value.products)
+                if ( index !== -1){
+                   category.value.products.splice(index, 1);
+                }
+                category = categories.next();
+            }
+
+            var shops = sh.shops;
+            var shop = shops.next();
+            while (shop.done !== true){
+                index = getShopProducts(product, shop.value.products)
+
+                if ( index !== -1){
+                    shop.value.products.splice(index, 1);
+                }
+                shop = shops.next();
+            }
+            
             products.splice(productPosition, 1);
-            
-            if (categoryPosition !== -1 ){
-                categories[i+1].products.splice(categoryPosition, 1);
-            }
-			
-            if (shopPosition !== -1 ){
-                shops[y+1].products.splice(shopPosition, 1);
-            }
-            
+ 
 		}else{
 			throw new ProductNotExistsException(product);
 		}
@@ -322,7 +336,7 @@ function StoreHouse(){
 
 		var productShopPosition = getShopProducts(product, shops[shopPosition].products); 	
 		if (productShopPosition === -1){
-            product.stock = num;
+            product.stockGen += num;
 			shops[shopPosition].products.push(
                 {
                  product: product,
@@ -365,6 +379,7 @@ function StoreHouse(){
 
 		if (productShopPosition !== -1){
 			shops[shopPosition].products[productShopPosition].stock += num;
+            product.stockGen += num;
 		}else{
 			throw new ProductNotExistsException(product);
 		}	
@@ -469,8 +484,13 @@ function StoreHouse(){
         if (indexShop !== -1){
             var i = 0;
             
-            while ( i < shops[indexShop].length){
-                this.addProductInShop(shops[indexShop].products[i], this.defaultShop, shops[indexShop].products[i].stock );
+            while ( i < shops[indexShop].products.length){
+                var indexDef = getShopProducts(shops[indexShop].products[i].product, shops[0].products)
+                if (indexDef == -1){
+                   this.addProductInShop(shops[indexShop].products[i].product, shops[0], shops[indexShop].products[i].stock ); 
+                }
+
+                i++;
             }
             shops.splice(indexShop, 1);
         }else{
@@ -552,79 +572,4 @@ function StoreHouse(){
 
 }
 
-function createObjects(sh){
-    
-        var cat1 = new Category("Ropa");
-        cat1.description = "Todo tipo de ropa";
-        var cat2 = new Category("Tecnología");
-        cat2.description = "Todo tipo de aparato electrónico";
-        var cat3 = new Category("Libros");
-        cat3.description = "Todo lo relacionado con la lectura";
-
-       var pro1 = new Product(1111, "Camiseta", 19.99);
-       pro1.description = "Camiseta Roja para hombre";
-       pro1.tax = 3;
-       pro1.images.push("imagenes/camiseta_roja.jpg")    
-       var pro2 = new Product(2222, "Portatil", 321.99)
-       pro2.description = "HP - BS017 - i5 - 15.6";
-       pro2.tax = 4;
-       pro2.images.push("imagenes/portatil.jpg")
-       var pro3 = new Product(3333, "Zapatos", 27.99);
-       pro3.description = "Zapatos Hugo Boss";
-       pro3.tax = 4;
-       pro3.images.push("imagenes/zapatos.jpg")
-       var pro4 = new Product(4444, "Vaqueros", 16.99);
-       pro4.description = "Vaquero Pepe Jeans Soho Z63";
-       pro4.tax = 5;
-       pro4.images.push("imagenes/vaqueros.jpg")
-       var pro5 = new Product(5555, "Movil", 189.49);
-       pro5.description = " Móvil Huawei P8 Lite - Negro";
-       pro5.tax = 5;
-       pro5.images.push("imagenes/movil.jpg")
-       var book = new Book(6666, "ESDLA", 20, 576);
-       book.description = "La comunidad del anillo (tapa dura)";
-       book.tax = 6;
-       book.images.push("imagenes/esdla.jpg")    
-       var tv = new TV(7777, "TV1", 1450, 48);
-       tv.description = "WXGA LED HD";
-       tv.tax = 6;
-       tv.images.push("imagenes/tv.jpg") 
-
-       var coor1 = new Coords(14, 68);
-       var shop1 = new Shop(1234, "Shop1", coor1);
-       shop1.direction = "C/ San Marcos N32";
-       shop1.phone = 123456789;    
-       var shop2 = new Shop(4321, "Shop2", coor1);
-       shop2.direction = "C/ Calle1 N2";
-       shop2.phone = 987654321; 
-       var shop3 = new Shop(6221, "Shop3", coor1);
-       shop3.direction = "C/ Calle Falsa N74";
-       shop3.phone = 282822110; 
-
-       sh.addProduct(pro1, cat1);
-       sh.addProduct(pro3, cat1);
-       sh.addProduct(pro4, cat1);
-       sh.addProduct(pro2, cat2);
-       sh.addProduct(pro5, cat2);
-       sh.addProduct(book, cat3);
-       sh.addProduct(tv, cat2);
-
-       sh.addProductInShop(pro1, shop1, 32);
-       sh.addProductInShop(pro1, shop2, 44);
-       sh.addProductInShop(pro2, shop1, 55);
-       sh.addProductInShop(pro2, shop2, 66);
-       sh.addProductInShop(pro3, shop3, 32);
-       sh.addProductInShop(pro3, shop1, 23);
-       sh.addProductInShop(pro4, shop1, 34);
-       sh.addProductInShop(pro4, shop2, 11);
-       sh.addProductInShop(pro4, shop3, 13);
-       sh.addProductInShop(pro5, shop2, 61);  
-       sh.addProductInShop(book, shop1, 31);  
-       sh.addProductInShop(tv, shop1, 11);  
-       sh.addProductInShop(tv, shop2, 4);  
-    }
-
- var sh = new StoreHouse();
- sh.name = "Test";
- createObjects(sh);
  
