@@ -235,14 +235,19 @@ function menuForms(){
     var cat = document.getElementById("listCategories");
     
     removeChildsElement(cat);
-    
-    var p = document.createElement("p");
-    p.setAttribute("class", "h3");
-    
-    p.appendChild(document.createTextNode("Autenticación"));
-    cat.appendChild(p);
-    
-    liForm("Iniciar Sesión", sesionForm);
+
+    if (!document.cookie){
+            var p = document.createElement("p");
+        p.setAttribute("class", "h3"); p.appendChild(document.createTextNode("Autenticación"));
+        cat.appendChild(p);
+        liForm("Iniciar Sesión", sesionForm);
+    }else{
+        var p = document.createElement("p");
+        p.setAttribute("class", "h3"); p.appendChild(document.createTextNode(document.cookie));
+        cat.appendChild(p);
+        liForm("Cerrar Sesión", closeSesion);
+    }
+   
     
     p = document.createElement("p");
     p.setAttribute("class", "h3"); p.appendChild(document.createTextNode("Categorias"));
@@ -261,12 +266,14 @@ function menuForms(){
     liForm("Modificar tienda", updShopForm);
     liForm("Eliminar tienda", delShopForm);
     
-    p = document.createElement("p");
-    p.setAttribute("class", "h3");
-    p.appendChild(document.createTextNode("Productos"));
-    cat.appendChild(p);
-    liForm("Añadir producto", addProForm);
-    liForm("Eliminar producto", delProForm);
+    if (document.cookie){
+       p = document.createElement("p");
+       p.setAttribute("class", "h3");
+       p.appendChild(document.createTextNode("Productos"));
+       cat.appendChild(p);
+       liForm("Añadir producto", addProForm);
+       liForm("Eliminar producto", delProForm); 
+    }  
 }
 
 function productCategory(product){

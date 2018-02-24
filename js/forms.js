@@ -713,3 +713,12 @@ function sesion(){
           }
      }
 }
+
+function closeSesion(){
+     return function (){
+          document.cookie = "username=; max-age=0";
+     }
+}
+
+
+
