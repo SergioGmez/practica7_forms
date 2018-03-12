@@ -235,15 +235,16 @@ function menuForms(){
     var cat = document.getElementById("listCategories");
     
     removeChildsElement(cat);
-
+    
     if (!document.cookie){
-            var p = document.createElement("p");
+        var p = document.createElement("p");
         p.setAttribute("class", "h3"); p.appendChild(document.createTextNode("Autenticación"));
         cat.appendChild(p);
         liForm("Iniciar Sesión", sesionForm);
     }else{
+        var reg = /[^=][a-z]*$/;
         var p = document.createElement("p");
-        p.setAttribute("class", "h3"); p.appendChild(document.createTextNode(document.cookie));
+        p.setAttribute("class", "h3"); p.appendChild(document.createTextNode("User: "+reg.exec(document.cookie)));
         cat.appendChild(p);
         liForm("Cerrar Sesión", closeSesion);
     }

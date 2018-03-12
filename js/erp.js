@@ -138,7 +138,6 @@ function StoreHouse(){
 		}	
 	});
     
-    
     //Definición del metodo 'get' del atributo shops. Devuelve iterador.
     Object.defineProperty(this, 'shops', {
 		get:function(){
@@ -182,7 +181,9 @@ function StoreHouse(){
             var i = 0;
 
             while ( i < categories[indexCategory].products.length){
-                this.addProduct(categories[indexCategory].products[i], categories[0]);
+                if (getCategoryProducts(categories[indexCategory].products[i], categories[0].products) === -1){
+                  this.addProduct(categories[indexCategory].products[i], categories[0]);  
+                }
                 i++;
             }
             categories.splice(indexCategory, 1);
@@ -240,7 +241,10 @@ function StoreHouse(){
         
 		if (productCategoryPos === -1){
 			categories[categoryPosition].products.push(product);
-            this.addProductInShop(product, shops[0], 0)
+            if (getShopProducts(product, shops[0].products) === -1){
+                this.addProductInShop(product, shops[0], 0);
+            }
+            
 		}else{
             throw new ProductExistsException(product);
 		}	
